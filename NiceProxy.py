@@ -1,7 +1,9 @@
+#!/usr/bin/env python
 import asyncio
 import logging
 import socket
 import ssl
+import sys, os
 HTTP_PROXY_ENABLE = True
 try:
     from httptools import HttpRequestParser, parse_url
@@ -13,7 +15,8 @@ try:
     asyncio.set_event_loop(uvloop.new_event_loop())
 except ImportError:
     pass
-
+ISWIN32 = sys.platform == 'win32'
+LOG_LEVEL = logging.WARN
 HOST = "0.0.0.0"       #本地监听IP
 PORT = 9001            #本地监听端口
 USERNAME = 'proxy'
@@ -24,8 +27,23 @@ UDP_IP = "0.0.0.0"      #sock5 UDP的端口
 SSL_ENABLE = False
 #ssl自签名证书可以通过下面命令生成
 #openssl req -new -x509 -days 3650 -nodes -out cert.pem -keyout key.pem
-SSL_CERT_FILE = 'cert.pem'
-SSL_KEY_FILE = 'key.pem'
+if ISWIN32:
+    SSL_CERT_FILE = 'keys/cert.pem'
+    SSL_KEY_FILE = 'keys/key.pem'
+    LOG_FILE = 'NiceProxy.log'
+else:
+    import pwd
+    USER = "NiceProxy"
+    SSL_CERT_FILE = '/usr/app/NiceProxy/keys/cert.pem'
+    SSL_KEY_FILE = '/usr/app/NiceProxy/keys/key.pem'
+    LOG_FILE = '/var/log/NiceProxy/NiceProxy.log'
+    PID_FILE = '/var/run/NiceProxy/NiceProxy.pid'
+
+logging.basicConfig(level=LOG_LEVEL,
+    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+    datefmt='%a, %d %b %Y %H:%M:%S',
+    filename=LOG_FILE,
+    filemode='a')
 
 def auth(username, password):   #修改这个实现自定义验证
     return username==USERNAME and password==PASSWORD
@@ -348,7 +366,7 @@ class RemoteClientProtocol(asyncio.Protocol):  #与远端地址建立连接的�
         if not self.transport.is_closing():
             self.transport.close()
 
-if __name__ == '__main__':
+def main():
     loop = asyncio.get_event_loop()
     context = None
     if SSL_ENABLE:
@@ -363,3 +381,35 @@ if __name__ == '__main__':
         loop.run_forever()
     finally:
         loop.close()
+
+if __name__ == '__main__':
+    if ISWIN32:
+        main()
+    else:
+        try:
+            user = pwd.getpwnam(USER)
+            uid = user.pw_uid
+        except:
+            logging.WARN("User: [%s] not Found! Using root is insecure!")
+            uid = pwd.getpwnam('root').pw_uid
+        pid = os.fork()
+        if(pid):sys.exit(0)
+        os.setsid()
+        os.chdir("/")
+        os.umask(0)
+        pid=os.fork()
+        if(pid):
+            try:
+                with open(PID_FILE, 'w') as f:
+                    f.write(str(pid))
+            except:
+                logging.error("Can't open file %s",PID_FILE)
+                sys.exit(-1)
+            else:
+                sys.exit(0)
+        os.setuid(uid)
+        os.setsid()
+        os.chdir("/")
+        os.umask(0)
+        main()
+

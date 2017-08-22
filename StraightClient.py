@@ -5,7 +5,8 @@ try:
 except ImportError:
     pass
 import ssl
-REMOTE_HOST = 'remote-addr.com'   #转发的地址
+REMOTE_HOSTNAME = 'remote-addr.com'   #若启用ssl,该值为建立ssl连接时验证服务证书签名使用的hostname
+REMOTE_HOST = 'remote-addr.com'  #转发的地址
 REMOTE_PORT = '8080'               #转发的端口
 
 HOST = '0.0.0.0'   #本地监听的ip
@@ -47,13 +48,16 @@ class Server(asyncio.Protocol):
 
     async def proxying(self):
         context = None
+        server_hostname = None
         if SSL_ENABLE:
             context = ssl.create_default_context()
             context.load_verify_locations(SSL_CERT_FILE)
+            server_hostname = REMOTE_HOSTNAME
         connect_coro = self.loop.create_connection(lambda: RemoteClientProtocol(self),
             self.host,
             self.port,
-            ssl=context)
+            ssl=context,
+            server_hostname=server_hostname)
         connect_task = asyncio.ensure_future(connect_coro)
         task = self.loop.call_later(self.timeout, self.cancel, connect_task)
         try:
