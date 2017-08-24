@@ -9,3 +9,4 @@ Sock4/5 and http(s) proxy
 + 添加了代理请求ssl封装支持，设置SSL_ENABLE = True，即可开启
 + 添加了个install.sh的脚本，将代理端自动安装成linux服务（NiceProxy），生成证书的时候CommonName必填，并且需要将StraightClient.py的REMOTE_HOSTNAME设置为这个值。当然这个在SSL_ENABLE开关打开的时候才生效。
 + windows将文件后缀改成pyw，双击即可以后台运行
++ HTTP代理时，websocket暂未支持。
