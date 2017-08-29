@@ -24,7 +24,7 @@ pip3 install -U httptools
 ### windows
 windows上部署可以通过修改后缀名为.pyw，或者使用pythonw来后台执行该脚本。自启动的方法自行配置。
 ### Linux
-拷贝NiceProxy.py和install.sh到服务器，使用root权限执行install.sh。如果不想开启ssl,一路回车就好；如果需要开启ssl，那么请看[SSL支持](#SSL支持)。
+拷贝NiceProxy.py和install.sh到服务器，使用root权限执行install.sh。如果不想开启ssl,一路回车就好；如果需要开启ssl，那么请看[SSL支持](#SSL)。
 
 ## StraightClient.py
 这个部署在本地，修改源码中`REMOTE_HOST`和`REMOTE_PORT`为远端机器的地址和端口，然后直接执行就好。
@@ -33,10 +33,10 @@ windows上部署可以通过修改后缀名为.pyw，或者使用pythonw来后台执行该脚本
 ### Linux
 使用supervisord等进程管理工具，来后台执行。
 
-## SSL支持
+## SSL
 若不开启SSL，StraightClient.py和StraightClient.py直接的通讯都是原始报文，网关可以很容易的得到交互的数据，并监听。为了保密起见可以启用SSL支持，这样通讯内容得到加密，确保不被窃取，监听。这里客户端和服务端都是自己的，所以SSL使用自签名的证书就好。  
 设置StraightClient.py，NiceProxy.py中的`SSL_ENABLE = True`，部署NiceProxy.py时执行install.sh时，会生成证书，这时会提示输入一些信息，其他都不重要可以不填，*CommonName一定要填写*。设置StraightClient.py中的`REMOTE_HOSTNAME`为填入的CommonName，然后拷贝远端机器上的`/usr/app/NiceProxy/keys/cert.pem`到本地，设置`SSL_CERT_FILE=cert.pem的路径`,重新启动StraghtClient.py就好。  
 ssl证书也可以是生成好的证书，只需要修改对应脚本中的的`SSL_CERT_FILE`和`SSL_KEY_FILE`。
 
 ## SOCK5验证
-SOCK5验证默认关闭，`AUTH_REQUIRE`设置为`True`可开启，开启之后USERNAME和PASSWORD为密码。 FirFox,chrome暂时不支持这种方式，并且暂时没有配置禁用某种代理协议，所以暂时意义不大。
+SOCK5验证默认关闭，`AUTH_REQUIRE`设置为`True`可开启，开启之后NiceProxy.py脚本中的USERNAME和PASSWORD的值为用户名和密码。 FireFox,chrome暂时不支持这种方式，并且暂时没有配置禁用某种代理协议，所以暂时意义不大。
