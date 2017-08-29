@@ -206,12 +206,15 @@ class ServerProtocol(asyncio.Protocol):
             self.task_list.append(task)
         elif not self.version and data.startswith(b'\x05'):
             self.version = 5
-            if data in (b'\x05\x02\x00\x02',b'\x05\x01\x00',b'\x05\x01\x02'):  #代理请求信息，这里只支持这几种情况
-                if AUTH_REQUIRE:
+            options = data[2:2+data[1]]
+            if AUTH_REQUIRE:
+                if b'\x02' in options:
                     self.write(b'\x05\x02') #返回b'\x05\x02'请求验证，返回b'\x05\x00'允许代理
                 else:
-                    self.authed = True
-                    self.write(b'\x05\x00')
+                    self.close()
+            else:
+                self.authed = True
+                self.write(b'\x05\x00')
         elif self.version==5:   
             if data.startswith(b'\x01'): #Sock5 的代理请求后的认证信息
                 u_len = data[1]
