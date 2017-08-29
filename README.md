@@ -24,7 +24,7 @@ pip3 install -U httptools
 ### windows
 windows上部署可以通过修改后缀名为.pyw，或者使用pythonw来后台执行该脚本。自启动的方法自行配置。
 ### Linux
-拷贝NiceProxy.py和install.sh到服务器，使用root权限执行install.sh。如果不想开启ssl,一路回车就好；如果需要开启ssl，那么请看[SSL支持](#SSL)。
+拷贝NiceProxy.py和install.sh到服务器，使用root权限执行install.sh。如果不想开启ssl,一路回车就好；如果需要开启ssl，那么请看[SSL支持](#ssl)。
 
 ## StraightClient.py
 这个部署在本地，修改源码中`REMOTE_HOST`和`REMOTE_PORT`为远端机器的地址和端口，然后直接执行就好。
