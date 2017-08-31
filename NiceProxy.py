@@ -393,7 +393,7 @@ if __name__ == '__main__':
             user = pwd.getpwnam(USER)
             uid = user.pw_uid
         except:
-            logging.WARN("User: [%s] not Found! Using root is insecure!")
+            logging.WARN("User: [%s] not Found! Using root is insecure!",USER)
             uid = pwd.getpwnam('root').pw_uid
         pid = os.fork()
         if(pid):sys.exit(0)
