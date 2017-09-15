@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import asyncio
 import logging
 import socket
@@ -71,10 +71,11 @@ class ServerProtocol(asyncio.Protocol):
         self.responsing = False
         self.body = []
         self.should_keep_alive = False
-
+        self._idle_handler = None
 
     def connection_made(self, transport):
         self.transport = transport
+        self._idle_handler = self.loop.call_later(60*5, self.close)
 
     def write(self, data):
         if self.is_http:
@@ -193,6 +194,8 @@ class ServerProtocol(asyncio.Protocol):
         self.responsing = True
 
     def data_received(self,data):
+        self._idle_handler.cancel()
+        self._idle_handler = self.loop.call_later(60*5, self.close)
         if self.connected:   #代理连接已经建立，大量的数据传输都在已建立连接的情况下，所以这个判断写最前面
             if self.remoteclient:
                 logging.debug("Send to remote:", data)
