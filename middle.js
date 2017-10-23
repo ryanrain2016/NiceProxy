@@ -1,8 +1,7 @@
 var net = require('net');
 var tls = require('tls');
 var fs = require('fs');
-//var HOST = 'v.ryan-site.site';
-//var PORT = 9005;
+
 const HOST = '127.0.0.1';
 const PORT = 5050;
 
