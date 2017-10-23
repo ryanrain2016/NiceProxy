@@ -40,3 +40,5 @@ ssl证书也可以是生成好的证书，只需要修改对应脚本中的的`SSL_CERT_FILE`和`SSL_KEY_F
 
 ## SOCK5验证
 SOCK5验证默认关闭，`AUTH_REQUIRE`设置为`True`可开启，开启之后NiceProxy.py脚本中的USERNAME和PASSWORD的值为用户名和密码。 FireFox,chrome暂时不支持这种方式，并且暂时没有配置禁用某种代理协议，所以暂时意义不大。
+
+## Nodejs版本的执行部署，proxy.js为服务端，middle.js为客户端。服务端需要http-proxy,代码量少好多额。
